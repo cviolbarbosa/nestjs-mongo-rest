@@ -1,0 +1,14 @@
+FROM node:14.16
+
+# Cached layer for node_modules to detect changes package.json
+COPY ./package.json  /tmp/package.json
+COPY ./package-lock.json  /tmp/package-lock.json
+RUN cd /tmp && npm install
+RUN mkdir -p /opt/app && cp -a /tmp/node_modules /opt/app
+
+
+# Main application
+COPY . /opt/app
+WORKDIR /opt/app
+
+CMD ["npm", "run", "start:dev"]

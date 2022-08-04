@@ -1,0 +1,62 @@
+version: "3"
+
+services:
+  # The Development mode uses in-memory store.
+  # To use the mongo database, change NODE_ENV to 'production'.
+
+  db:
+    image: mongo:5.0.9
+    container_name: db_mongo
+    volumes:
+      - mongodata:/data/db
+    ports:
+      - 27017:27017
+    logging:
+      driver: none
+
+
+  runbackend:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile-dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/opt/app
+    environment:
+      - DBHOST=not_used
+      - NODE_ENV=development 
+    command: npm run start:dev
+
+
+  unittest:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile-dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/opt/app
+    environment:
+      - DBHOST=notused
+      - NODE_ENV=development
+    command: npm run test
+
+
+  e2etest:
+    build: 
+      context: .
+      dockerfile: ./Dockerfile-dev
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/opt/app
+    environment:
+      - DBHOST=db_mongo
+      - NODE_ENV=production
+    command: npm run test:e2e
+    depends_on:
+      - db
+
+volumes:
+  mongodata: 

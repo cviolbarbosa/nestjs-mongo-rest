@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+
+  db:
+    image: mongo:5.0.9
+    container_name: db_mongo_prod
+    volumes:
+      - mongodata_prod:/data/db
+    restart: unless-stopped
+
+
+  nodejsprod:
+    image: develper-backend-nodejs:0.1.0
+    ports:
+      - 3000:3000
+    environment:
+      - DBHOST=${DBHOST}
+      - NODE_ENV=production
+    command: node /code/dist/main
+    depends_on:
+      - db
+    restart: unless-stopped
+
+
+volumes:
+  mongodata_prod: 
